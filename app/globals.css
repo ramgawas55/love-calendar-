@@ -1,26 +1,177 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600&display=swap');
 @import "tailwindcss";
 
+/* ── Design Tokens ── */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg:          #0D0D0D;
+  --surface:     #141414;
+  --card:        #1A1A1A;
+  --card-hover:  #1F1F1F;
+  --border:      #272727;
+  --border-light:#2F2F2F;
+  --text:        #F5ECD7;
+  --text-muted:  #8B7355;
+  --text-dim:    #5A4A35;
+  --accent:      #C84B4B;
+  --accent-light:#E87070;
+  --accent-dim:  #7A2B2B;
+  --gold:        #C9A96E;
+  --gold-dim:    #8A6B3E;
+  --radius:      12px;
+  --radius-lg:   20px;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-display: 'Playfair Display', Georgia, serif;
+  --font-body:    'Inter', system-ui, sans-serif;
+  --color-bg:          var(--bg);
+  --color-surface:     var(--surface);
+  --color-card:        var(--card);
+  --color-border:      var(--border);
+  --color-text:        var(--text);
+  --color-muted:       var(--text-muted);
+  --color-accent:      var(--accent);
+  --color-accent-light:var(--accent-light);
+  --color-gold:        var(--gold);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ── Base ── */
+*, *::before, *::after { box-sizing: border-box; }
+
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  min-height: 100dvh;
 }
+
+/* ── Typography ── */
+.font-display { font-family: 'Playfair Display', Georgia, serif; }
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-dim); }
+
+/* ── Grain texture overlay ── */
+.grain::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.025;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  z-index: 9999;
+}
+
+/* ── Glass morphism ── */
+.glass {
+  background: rgba(26, 26, 26, 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border);
+}
+
+.glass-strong {
+  background: rgba(20, 20, 20, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border-light);
+}
+
+/* ── Glow effects ── */
+.glow-accent {
+  box-shadow: 0 0 20px rgba(200, 75, 75, 0.15), 0 0 40px rgba(200, 75, 75, 0.05);
+}
+
+.text-glow-accent {
+  text-shadow: 0 0 20px rgba(200, 75, 75, 0.4);
+}
+
+/* ── Input resets ── */
+input, textarea, select {
+  background: var(--card);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.625rem 0.875rem;
+  font-family: inherit;
+  font-size: 0.875rem;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  width: 100%;
+}
+input:focus, textarea:focus, select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(200, 75, 75, 0.15);
+}
+input::placeholder, textarea::placeholder {
+  color: var(--text-dim);
+}
+
+/* ── Calendar ── */
+.calendar-cell {
+  aspect-ratio: 1;
+  border-radius: 8px;
+  transition: background 0.15s, transform 0.1s;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 4px;
+  min-height: 44px;
+}
+.calendar-cell:hover { background: var(--card-hover); transform: scale(1.02); }
+.calendar-cell.today { background: rgba(200, 75, 75, 0.12); border: 1px solid rgba(200, 75, 75, 0.4); }
+.calendar-cell.has-memory { position: relative; }
+.calendar-cell.selected { background: var(--accent-dim); border: 1px solid var(--accent); }
+
+/* ── Skeleton loader ── */
+.skeleton {
+  background: linear-gradient(90deg, var(--card) 25%, var(--card-hover) 50%, var(--card) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: var(--radius);
+}
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ── Page transitions ── */
+.page-enter { opacity: 0; transform: translateY(12px); }
+.page-enter-active { opacity: 1; transform: translateY(0); transition: all 0.3s ease-out; }
+
+/* ── Mobile bottom nav spacing ── */
+.has-bottom-nav { padding-bottom: 80px; }
+
+/* ── Reduced motion ── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ── Focus visible ── */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* ── Custom scrollable containers ── */
+.hide-scrollbar::-webkit-scrollbar { display: none; }
+.hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
