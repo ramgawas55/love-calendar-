@@ -1,4 +1,5 @@
 import { redirect } from 'next/navigation'
+import { headers } from 'next/headers'
 import { createClient } from '@/lib/supabase/server'
 import Navigation from '@/components/layout/Navigation'
 import BottomNav from '@/components/layout/BottomNav'
@@ -8,10 +9,23 @@ export default async function AppLayout({
 }: {
     children: React.ReactNode
 }) {
+    const headersList = await headers()
+    const pathname = headersList.get('x-current-pathname') || '/'
+
     const supabase = await createClient()
 
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) redirect('/login')
+
+    if (pathname === '/setup') {
+        return (
+            <div className="min-h-dvh flex flex-col relative overflow-x-hidden">
+                <main className="flex-1 max-w-6xl w-full mx-auto px-4 md:px-8 pt-6 pb-24 md:pb-12">
+                    {children}
+                </main>
+            </div>
+        )
+    }
 
     // Check relationship membership (any record means user belongs to a relationship)
     const { data: membership } = await supabase
