@@ -1,13 +1,14 @@
 'use client'
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, useEffect, Suspense } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Heart, Plus, Users, ArrowRight, Loader2, Sparkles } from 'lucide-react'
 import { todayISO } from '@/lib/utils/date'
 
-export default function SetupPage() {
+function SetupContent() {
     const router = useRouter()
+    const searchParams = useSearchParams()
     const [mode, setMode] = useState<'choose' | 'create' | 'join'>('choose')
 
     const [relName, setRelName] = useState('Our Relationship')
@@ -17,6 +18,14 @@ export default function SetupPage() {
 
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState('')
+
+    useEffect(() => {
+        const invite = searchParams.get('invite')
+        if (invite) {
+            setInviteToken(invite)
+            setMode('join')
+        }
+    }, [searchParams])
 
     async function handleCreateRelationship(e: React.FormEvent) {
         e.preventDefault()
@@ -281,5 +290,17 @@ export default function SetupPage() {
 
             </div>
         </div>
+    )
+}
+
+export default function SetupPage() {
+    return (
+        <Suspense fallback={
+            <div className="flex items-center justify-center min-h-[40dvh]">
+                <Loader2 className="w-8 h-8 animate-spin text-rose-500" />
+            </div>
+        }>
+            <SetupContent />
+        </Suspense>
     )
 }

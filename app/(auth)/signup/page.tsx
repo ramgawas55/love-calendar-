@@ -1,14 +1,15 @@
 'use client'
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, useEffect, Suspense } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { Heart, Mail, Lock, User, Eye, EyeOff, Loader2 } from 'lucide-react'
 import { motion } from 'framer-motion'
 
-export default function SignupPage() {
+function SignupForm() {
     const router = useRouter()
+    const searchParams = useSearchParams()
     const [displayName, setDisplayName] = useState('')
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
@@ -37,7 +38,8 @@ export default function SignupPage() {
         }
 
         if (data?.user) {
-            router.push('/setup')
+            const invite = searchParams.get('invite')
+            router.push(invite ? `/setup?invite=${invite}` : '/setup')
             router.refresh()
         }
     }
@@ -167,5 +169,17 @@ export default function SignupPage() {
                 </p>
             </div>
         </motion.div>
+    )
+}
+
+export default function SignupPage() {
+    return (
+        <Suspense fallback={
+            <div className="flex items-center justify-center min-h-[40dvh]">
+                <Loader2 className="w-8 h-8 animate-spin text-rose-500" />
+            </div>
+        }>
+            <SignupForm />
+        </Suspense>
     )
 }

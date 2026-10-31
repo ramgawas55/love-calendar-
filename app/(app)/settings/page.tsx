@@ -125,7 +125,8 @@ export default function SettingsPage() {
 
     function copyInvite() {
         if (!inviteToken) return
-        navigator.clipboard.writeText(inviteToken)
+        const inviteUrl = `${window.location.origin}/signup?invite=${inviteToken}`
+        navigator.clipboard.writeText(inviteUrl)
         setCopied(true)
         setTimeout(() => setCopied(false), 2500)
     }
