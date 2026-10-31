@@ -1,6 +1,11 @@
+```
 # Our Love Calendar ❤️
 
-A private, cinematic digital memory archive designed exclusively for two people.
+A private digital scrapbook for couples to preserve, organize, and relive memories.
+
+---
+*Auto-Redeploy Trigger: v1.0.1 - 2026-10-31*
+---
 
 ## Features
 - **Hero & Relationship Counter**: Dynamic live counter of days, months, and years together with next anniversary countdown.
