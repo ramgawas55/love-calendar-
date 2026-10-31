@@ -33,8 +33,11 @@ CREATE TABLE IF NOT EXISTS public.relationships (
   id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name        TEXT NOT NULL DEFAULT 'Our Story',
   started_at  DATE NOT NULL,
+  created_by  UUID REFERENCES public.profiles(id),
   created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+
+COMMENT ON COLUMN public.relationships.created_by IS 'User who originally created this relationship — used by RLS to grant immediate visibility on INSERT RETURNING.';
 
 -- ── Relationship Members (max 2) ───────────────────────────────
 CREATE TABLE IF NOT EXISTS public.relationship_members (

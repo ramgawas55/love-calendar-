@@ -219,10 +219,6 @@ CREATE POLICY "Members can update their relationship"
   ON public.relationships FOR UPDATE
   USING (id IN (SELECT public.my_relationship_ids()));
 
-CREATE POLICY "Members can delete their relationship"
-  ON public.relationships FOR DELETE
-  USING (id IN (SELECT public.my_relationship_ids()));
-
 -- =====================================================
 -- RELATIONSHIP_MEMBERS
 -- =====================================================
@@ -230,26 +226,11 @@ ALTER TABLE public.relationship_members ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "Users can view members of their relationship"
   ON public.relationship_members FOR SELECT
-  USING (
-    user_id = auth.uid()
-    OR relationship_id IN (
-      SELECT rm.relationship_id
-      FROM public.relationship_members rm
-      WHERE rm.user_id = auth.uid()
-    )
-  );
+  USING (relationship_id IN (SELECT public.my_relationship_ids()));
 
 CREATE POLICY "Users can join a relationship"
   ON public.relationship_members FOR INSERT
   WITH CHECK (auth.uid() = user_id);
-
-CREATE POLICY "Users can update own join rows"
-  ON public.relationship_members FOR UPDATE
-  USING (user_id = auth.uid());
-
-CREATE POLICY "Users can remove themselves from a relationship"
-  ON public.relationship_members FOR DELETE
-  USING (user_id = auth.uid());
 
 -- =====================================================
 -- INVITE_TOKENS
@@ -259,23 +240,17 @@ ALTER TABLE public.invite_tokens ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Members can create invite tokens for their relationship"
   ON public.invite_tokens FOR INSERT
   WITH CHECK (
-    created_by = auth.uid() AND (
-      EXISTS (
-        SELECT 1 FROM public.relationship_members rm
-        WHERE rm.relationship_id = invite_tokens.relationship_id
-          AND rm.user_id = auth.uid()
-      )
-      OR relationship_id IN (SELECT public.my_relationship_ids())
-    )
+    relationship_id IN (SELECT public.my_relationship_ids()) AND
+    created_by = auth.uid()
   );
 
 CREATE POLICY "Any authenticated user can read an unexpired token"
   ON public.invite_tokens FOR SELECT
   USING (auth.uid() IS NOT NULL);
 
-CREATE POLICY "Users can consume a valid unused invite token"
+CREATE POLICY "Any authenticated user can mark token as used"
   ON public.invite_tokens FOR UPDATE
-  USING (auth.uid() IS NOT NULL AND used_at IS NULL);
+  USING (auth.uid() IS NOT NULL);
 
 -- =====================================================
 -- MEMORIES
