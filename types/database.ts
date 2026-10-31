@@ -19,6 +19,7 @@ export interface Relationship {
   id: string
   name: string
   started_at: string
+  created_by: string | null
   created_at: string
 }
 

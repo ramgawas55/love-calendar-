@@ -42,6 +42,7 @@ function SetupContent() {
                 .insert({
                     name: relName,
                     started_at: startedAt,
+                    created_by: user.id,
                 })
                 .select()
                 .single()

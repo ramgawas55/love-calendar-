@@ -64,6 +64,7 @@ CREATE TABLE IF NOT EXISTS public.relationships (
   id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name        TEXT NOT NULL DEFAULT 'Our Story',
   started_at  DATE NOT NULL,
+  created_by  UUID REFERENCES public.profiles(id),
   created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 

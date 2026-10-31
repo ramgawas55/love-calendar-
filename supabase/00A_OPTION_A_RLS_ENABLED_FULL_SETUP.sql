@@ -57,6 +57,7 @@ CREATE TABLE IF NOT EXISTS public.relationships (
   id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name        TEXT NOT NULL DEFAULT 'Our Story',
   started_at  DATE NOT NULL,
+  created_by  UUID REFERENCES public.profiles(id),
   created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
@@ -209,15 +210,24 @@ ALTER TABLE public.relationships ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "Members can view their relationship"
   ON public.relationships FOR SELECT
-  USING (id IN (SELECT public.my_relationship_ids()));
+  USING (
+    id IN (SELECT public.my_relationship_ids()) OR
+    created_by = auth.uid()
+  );
 
 CREATE POLICY "Authenticated users can create relationships"
   ON public.relationships FOR INSERT
-  WITH CHECK (auth.uid() IS NOT NULL);
+  WITH CHECK (
+    auth.uid() IS NOT NULL AND
+    created_by = auth.uid()
+  );
 
 CREATE POLICY "Members can update their relationship"
   ON public.relationships FOR UPDATE
-  USING (id IN (SELECT public.my_relationship_ids()));
+  USING (
+    id IN (SELECT public.my_relationship_ids()) OR
+    created_by = auth.uid()
+  );
 
 -- =====================================================
 -- RELATIONSHIP_MEMBERS
